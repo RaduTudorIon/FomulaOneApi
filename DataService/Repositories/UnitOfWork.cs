@@ -6,6 +6,7 @@ namespace FormulaOne.DataService.Repositories;
 public class UnitOfWork : IUnitOfWork, IDisposable
 {
     private readonly AppDbContext _context;
+    private bool _disposed = false;
 
     public IDriverRepository Drivers { get; private set; }
     public IAchievementsRepository Achievements { get; private set; }
@@ -25,8 +26,22 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         return result > 0;
     }
 
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _context.Dispose();
+            }
+
+            _disposed = true;
+        }
+    }
+
     public void Dispose()
     {
-        _context.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }
